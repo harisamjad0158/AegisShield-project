@@ -93,3 +93,48 @@ spec:
       ports:
         - {protocol: UDP, port: 53}
         - {protocol: TCP, port: 53}
+
+---
+# Allow the NGINX frontend to reach the Payment API.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-allow-payment-api-egress
+  namespace: aegis-app
+spec:
+  podSelector:
+    matchLabels:
+      app: frontend
+      tier: presentation
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: payment-api
+              tier: core-application
+      ports:
+        - protocol: TCP
+          port: 8080
+---
+# Allow API ingress only from frontend Pods for this internal path.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-allow-frontend-ingress
+  namespace: aegis-app
+spec:
+  podSelector:
+    matchLabels:
+      app: payment-api
+      tier: core-application
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: frontend
+              tier: presentation
+      ports:
+        - protocol: TCP
+          port: 8080

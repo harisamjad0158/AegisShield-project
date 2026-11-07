@@ -52,3 +52,8 @@ build/
 
 # Helm-generated packages
 *.tgz
+.venv-stage8/
+.coverage
+htmlcov/
+.security-reports/
+.venv-security/

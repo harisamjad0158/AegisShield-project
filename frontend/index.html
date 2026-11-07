@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AegisShield | Payment Dashboard</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, system-ui, Arial, sans-serif;
+      background: #081225;
+      color: #edf3ff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(145deg, #081225, #12274b);
+    }
+
+    header {
+      padding: 24px 6%;
+      border-bottom: 1px solid #304263;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    header h1 { margin: 0; font-size: 23px; }
+
+    .badge {
+      background: #164e42;
+      color: #8df5c3;
+      border-radius: 30px;
+      padding: 8px 13px;
+      font-size: 12px;
+    }
+
+    main {
+      max-width: 1050px;
+      margin: 48px auto;
+      padding: 0 20px;
+    }
+
+    .intro { margin-bottom: 30px; }
+    .intro h2 { font-size: 32px; margin-bottom: 8px; }
+    .intro p { color: #a7b8d2; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 22px;
+    }
+
+    .card {
+      background: #132541;
+      border: 1px solid #304263;
+      border-radius: 16px;
+      padding: 26px;
+    }
+
+    .card h3 { margin-top: 0; }
+
+    label {
+      display: block;
+      margin: 18px 0 8px;
+      color: #c8d6ea;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #496080;
+      border-radius: 9px;
+      background: #09172d;
+      color: white;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 22px;
+      padding: 14px;
+      border: 0;
+      border-radius: 9px;
+      background: #377cf6;
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover { background: #2768da; }
+    button:disabled { opacity: .6; cursor: wait; }
+
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #09172d;
+      border-radius: 10px;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .muted { color: #a7b8d2; font-size: 13px; }
+    .success { color: #8df5c3; }
+    .error { color: #ff9e9e; }
+
+    footer {
+      margin: 40px 0;
+      text-align: center;
+      color: #a7b8d2;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>🛡 AegisShield</h1>
+    <span class="badge">SIMULATED PAYMENTS</span>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h2>Payment Dashboard</h2>
+      <p>Kubernetes · FastAPI · PostgreSQL · Helm</p>
+      <p class="muted">
+        Development demonstration only.
+        No real money transfers or card data.
+      </p>
+    </section>
+
+    <div class="grid">
+
+      <section class="card">
+        <h3>Create Test Payment</h3>
+
+        <form id="paymentForm">
+          <label for="amount">Amount</label>
+          <input
+            id="amount"
+            type="number"
+            value="10.00"
+            min="0.01"
+            max="9999999999.99"
+            step="0.01"
+            required
+          >
+
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="EUR" selected>EUR — Euro</option>
+            <option value="USD">USD — US Dollar</option>
+            <option value="GBP">GBP — British Pound</option>
+          </select>
+
+          <button id="payButton" type="submit">
+            Submit Test Payment
+          </button>
+        </form>
+
+        <div id="paymentResult" class="result" role="status" aria-live="polite">
+          No payment submitted yet.
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Find Payment</h3>
+
+        <form id="lookupForm">
+          <label for="paymentId">Payment ID</label>
+          <input
+            id="paymentId"
+            type="text"
+            placeholder="Enter payment UUID"
+            required
+          >
+
+          <button id="lookupButton" type="submit">
+            Retrieve Payment
+          </button>
+        </form>
+
+        <div id="lookupResult" class="result" role="status" aria-live="polite">
+          Enter a payment ID to retrieve its details.
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    AegisShield — Zero-Trust Kubernetes Demonstration
+  </footer>
+
+  <script>
+    "use strict";
+
+    const paymentForm = document.getElementById("paymentForm");
+    const lookupForm = document.getElementById("lookupForm");
+
+    function display(elementId, message, type = "") {
+      const element = document.getElementById(elementId);
+      element.textContent = message;
+      element.className = "result " + type;
+    }
+
+    async function request(url, options = {}) {
+      const response = await fetch(url, {
+        ...options,
+        credentials: "same-origin",
+        headers: {
+          "Accept": "application/json",
+          ...(options.body ? {"Content-Type": "application/json"} : {})
+        }
+      });
+
+      const raw = await response.text();
+      let data;
+
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        throw new Error("Unexpected API response (HTTP " + response.status + ")");
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          typeof data.detail === "string"
+            ? data.detail
+            : "Request failed (HTTP " + response.status + ")"
+        );
+      }
+
+      return data;
+    }
+
+    paymentForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const amountInput = document.getElementById("amount");
+      const amount = Number(amountInput.value);
+      const currency = document.getElementById("currency").value;
+      const button = document.getElementById("payButton");
+
+      if (!Number.isFinite(amount) ||
+          amount <= 0 ||
+          amount > 9999999999.99 ||
+          !/^\d+(\.\d{1,2})?$/.test(amountInput.value)) {
+        display("paymentResult", "Enter a valid positive amount with up to two decimal places.", "error");
+        return;
+      }
+
+      button.disabled = true;
+      display("paymentResult", "Submitting simulated payment...");
+
+      try {
+        const payment = await request("/api/pay", {
+          method: "POST",
+          body: JSON.stringify({amount, currency})
+        });
+
+        display(
+          "paymentResult",
+          "Payment recorded successfully!\n\n" +
+          "Amount: " + payment.amount + " " + payment.currency + "\n" +
+          "Status: " + payment.status + "\n" +
+          "Payment ID: " + payment.payment_id + "\n" +
+          "Created: " + payment.created_at,
+          "success"
+        );
+
+        document.getElementById("paymentId").value = payment.payment_id;
+      } catch (error) {
+        display("paymentResult", error.message, "error");
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    lookupForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const id = document.getElementById("paymentId").value.trim();
+      const button = document.getElementById("lookupButton");
+
+      if (!/^[0-9a-fA-F-]{36}$/.test(id)) {
+        display("lookupResult", "Enter a valid payment UUID.", "error");
+        return;
+      }
+
+      button.disabled = true;
+      display("lookupResult", "Retrieving payment...");
+
+      try {
+        const payment = await request(
+          "/api/payments/" + encodeURIComponent(id)
+        );
+
+        display(
+          "lookupResult",
+          JSON.stringify(payment, null, 2),
+          "success"
+        );
+      } catch (error) {
+        display("lookupResult", error.message, "error");
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
