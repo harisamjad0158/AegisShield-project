@@ -417,7 +417,7 @@ Open the browser:
 
 **http://localhost:8082**
 
-<img width="342" height="175" alt="{496E7D4D-AC56-4671-B24B-23E64EA9ADF7}" src="https://github.com/user-attachments/assets/d8b5b130-08a0-4a67-8758-4a7baa3a7865" />
+<img width="394" height="257" alt="{EFB89391-8F0C-4E69-8E8A-557ECFE370F7}" src="https://github.com/user-attachments/assets/0d72f885-a975-447c-aae3-e9e52fae1ac8" />
 
 
 The dashboard provides:
