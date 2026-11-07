@@ -1,0 +1,54 @@
+# Requires ingress-nginx controller, a working OIDC auth proxy service,
+# DNS, and TLS secret aegis-edge-tls. No ingress controller/auth proxy is installed by this file.
+# Controller must enforce external auth for both routes (test with unauthenticated requests).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aegis-dashboard
+  namespace: aegis-app
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/auth-url: 'http://oauth2-proxy.aegis-edge.svc.cluster.local:4180/oauth2/auth'
+    nginx.ingress.kubernetes.io/auth-signin: 'https://aegis.example.com:18443/oauth2/start?rd=$escaped_request_uri'
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+    nginx.ingress.kubernetes.io/rewrite-target: '/$2'
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [aegis.example.com]
+      secretName: aegis-edge-tls
+  rules:
+    - host: aegis.example.com
+      http:
+        paths:
+          - path: /dashboard(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service: {name: frontend, port: {name: http}}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aegis-payment
+  namespace: aegis-app
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/auth-url: 'http://oauth2-proxy.aegis-edge.svc.cluster.local:4180/oauth2/auth'
+    nginx.ingress.kubernetes.io/auth-signin: 'https://aegis.example.com:18443/oauth2/start?rd=$escaped_request_uri'
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+    nginx.ingress.kubernetes.io/rewrite-target: '/$2'
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: [aegis.example.com]
+      secretName: aegis-edge-tls
+  rules:
+    - host: aegis.example.com
+      http:
+        paths:
+          - path: /pay(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service: {name: payment-api, port: {name: http}}

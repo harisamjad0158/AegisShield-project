@@ -1,0 +1,44 @@
+{{- if .Values.frontend.vpa.enabled }}
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: frontend
+  namespace: aegis-app
+  labels: {app.kubernetes.io/part-of: aegisshield, app.kubernetes.io/component: resource-recommendations}
+spec:
+  targetRef: {apiVersion: apps/v1, kind: Deployment, name: frontend}
+  updatePolicy: {updateMode: "Off"}
+  resourcePolicy:
+    containerPolicies:
+      - {containerName: nginx, controlledResources: [cpu, memory]}
+---
+{{- end }}
+{{- if .Values.api.vpa.enabled }}
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: payment-api
+  namespace: aegis-app
+  labels: {app.kubernetes.io/part-of: aegisshield, app.kubernetes.io/component: resource-recommendations}
+spec:
+  targetRef: {apiVersion: apps/v1, kind: Deployment, name: payment-api}
+  updatePolicy: {updateMode: "Off"}
+  resourcePolicy:
+    containerPolicies:
+      - {containerName: api, controlledResources: [cpu, memory]}
+---
+{{- end }}
+{{- if .Values.postgres.vpa.enabled }}
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: postgres
+  namespace: aegis-data
+  labels: {app.kubernetes.io/part-of: aegisshield, app.kubernetes.io/component: resource-recommendations}
+spec:
+  targetRef: {apiVersion: apps/v1, kind: StatefulSet, name: postgres}
+  updatePolicy: {updateMode: "Off"}
+  resourcePolicy:
+    containerPolicies:
+      - {containerName: postgres, controlledResources: [cpu, memory]}
+{{- end }}

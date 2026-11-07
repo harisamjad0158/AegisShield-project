@@ -1,0 +1,6 @@
+frontend:
+  hpa:
+    maxReplicas: 4
+api:
+  hpa:
+    maxReplicas: 5

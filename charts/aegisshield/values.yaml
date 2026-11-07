@@ -1,0 +1,26 @@
+frontend:
+  replicas: 3
+  image: nginx:1.27.3-alpine
+  hpa:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 65
+  vpa:
+    enabled: true
+api:
+  replicas: 3
+  image: registry.example.com/aegisshield/payment-api:1.0.0
+  hpa:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 65
+  vpa:
+    enabled: true
+postgres:
+  image: postgres:16.6
+  storageSize: 10Gi
+  storageClassName: ""
+  vpa:
+    enabled: true

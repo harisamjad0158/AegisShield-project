@@ -1,0 +1,54 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Credentials and private keys
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.kubeconfig
+credentials.json
+.kube/
+
+# Local authentication secrets
+auth-stack/local-secrets/
+
+# Local TLS certificates and keys
+local-tls/
+
+# Historical configuration backups
+backups/
+auth-stack/backups/
+
+# Temporary and backup files
+*.backup
+*.bak
+*.tmp
+*.log
+*.swp
+*~
+*.pre-auth-routing
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# Node.js
+node_modules/
+dist/
+build/
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+
+# Helm-generated packages
+*.tgz

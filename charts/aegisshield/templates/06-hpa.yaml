@@ -1,0 +1,41 @@
+{{- if .Values.frontend.hpa.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: frontend
+  namespace: aegis-app
+  labels: {app.kubernetes.io/part-of: aegisshield, app.kubernetes.io/component: autoscaling}
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: frontend}
+  minReplicas: {{ .Values.frontend.hpa.minReplicas }}
+  maxReplicas: {{ .Values.frontend.hpa.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: {type: Utilization, averageUtilization: {{ .Values.frontend.hpa.targetCPUUtilizationPercentage }}}
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+---
+{{- end }}
+{{- if .Values.api.hpa.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: payment-api
+  namespace: aegis-app
+  labels: {app.kubernetes.io/part-of: aegisshield, app.kubernetes.io/component: autoscaling}
+spec:
+  scaleTargetRef: {apiVersion: apps/v1, kind: Deployment, name: payment-api}
+  minReplicas: {{ .Values.api.hpa.minReplicas }}
+  maxReplicas: {{ .Values.api.hpa.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: {type: Utilization, averageUtilization: {{ .Values.api.hpa.targetCPUUtilizationPercentage }}}
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+{{- end }}

@@ -1,0 +1,23 @@
+api:
+  image: aegisshield/payment-api:1.0.0
+  hpa:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 65
+  vpa:
+    enabled: true
+
+frontend:
+  hpa:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 65
+  vpa:
+    enabled: true
+
+postgres:
+  storageSize: 10Gi
+  vpa:
+    enabled: true

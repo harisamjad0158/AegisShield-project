@@ -1,0 +1,95 @@
+# Database namespace: deny every ingress AND egress by default.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: database-default-deny
+  namespace: aegis-data
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+# Only core-application pods in the explicitly labeled app namespace may reach PostgreSQL:5432.
+# Namespace selector is ESSENTIAL: a pod label alone would be too broad across namespaces.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: database-allow-core-api-ingress
+  namespace: aegis-data
+spec:
+  podSelector:
+    matchLabels: {app: postgres, tier: data}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: aegis-app}
+          podSelector:
+            matchLabels: {tier: core-application, app: payment-api}
+      ports: [{protocol: TCP, port: 5432}]
+---
+# No database outbound connections are allowed in this minimal demo.
+# Add explicit egress only if backup/monitoring/DNS workflows require it.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: app-default-deny
+  namespace: aegis-app
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+---
+# Permit requests only from ingress-controller pods (adjust namespace/labels for your controller).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: app-allow-edge-ingress
+  namespace: aegis-app
+spec:
+  podSelector:
+    matchExpressions:
+      - {key: app, operator: In, values: [frontend, payment-api]}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: ingress-nginx}
+          podSelector:
+            matchLabels: {app.kubernetes.io/name: ingress-nginx, app.kubernetes.io/component: controller}
+      ports: [{protocol: TCP, port: 8080}]
+---
+# Core API egress to PostgreSQL only.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-allow-postgres-egress
+  namespace: aegis-app
+spec:
+  podSelector:
+    matchLabels: {app: payment-api, tier: core-application}
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: aegis-data}
+          podSelector:
+            matchLabels: {app: postgres, tier: data}
+      ports: [{protocol: TCP, port: 5432}]
+---
+# DNS resolution for application pods; verify CoreDNS labels in your cluster.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: app-allow-dns-egress
+  namespace: aegis-app
+spec:
+  podSelector: {}
+  policyTypes: [Egress]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: kube-system}
+          podSelector:
+            matchLabels: {k8s-app: kube-dns}
+      ports:
+        - {protocol: UDP, port: 53}
+        - {protocol: TCP, port: 53}

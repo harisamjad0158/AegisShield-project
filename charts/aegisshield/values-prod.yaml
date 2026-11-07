@@ -1,0 +1,10 @@
+# Example sizing only; not a PCI-compliant production configuration.
+frontend:
+  hpa:
+    maxReplicas: 12
+api:
+  hpa:
+    maxReplicas: 20
+postgres:
+  storageSize: 100Gi
+  # storageClassName: encrypted-csi
