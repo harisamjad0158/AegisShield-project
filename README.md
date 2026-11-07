@@ -10,6 +10,7 @@ A portfolio-oriented, **not production-ready** Kubernetes reference project. It 
 - **Tier 4**: PostgreSQL StatefulSet with 10Gi PVC and database namespace isolation
 - **Helm**: parameterized images, replica settings, storage, HPA and VPA
 - **VPA**: `updateMode: Off` for all three workloads; recommendations only, avoids fighting HPA
+<img width="1536" height="1024" alt="AegisShield Zero-Trust Kubernetes Architecture" src="https://github.com/user-attachments/assets/d34e9c40-7465-4939-b3fe-ed67974fa3d0" />
 
 ## Prerequisites
 
