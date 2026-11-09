@@ -31,6 +31,53 @@ The four websites are:
 
 **Total: eight application Pods.** Ingress and other infrastructure Pods are not included in this number.
 
+## 🎯 Project Objective
+
+To design, deploy, automate, and secure a **cloud-native, microservices-based application platform** using Docker, Kubernetes, Helm, and DevSecOps practices.
+
+The project focuses on implementing **container orchestration, automated application deployment, horizontal and vertical autoscaling (HPA/VPA), secure service-to-service communication, identity and access management, and continuous integration and security testing**.
+
+It also aims to demonstrate high availability, application reliability, resource optimization, network isolation, and vulnerability management within a multi-node Kubernetes environment.
+
+### 🔧 Key Technical Objectives
+
+1. **Containerization:** Package frontend and backend applications into Docker containers for consistent deployment.
+
+2. **Container Orchestration:** Deploy and manage application workloads across a three-node Kubernetes cluster using Kind.
+
+3. **Infrastructure Automation:** Use Helm charts to standardize application configuration, deployment, and lifecycle management.
+
+4. **Autoscaling:** Configure Horizontal Pod Autoscaler (HPA) and Vertical Pod Autoscaler (VPA) to support workload scalability and resource optimization.
+
+5. **Identity and Access Management:** Integrate Keycloak and OAuth2 Proxy for authentication and controlled application access.
+
+6. **Network Security:** Implement Calico NetworkPolicies, namespace isolation, and restricted Pod security configurations.
+
+7. **Database Integration:** Deploy PostgreSQL for persistent application data storage and validate secure database connectivity.
+
+8. **CI/CD and DevSecOps:** Integrate GitHub Actions, automated testing, dependency auditing, container vulnerability scanning, and security validation.
+
+9. **Reliability and Observability:** Configure health checks, resource monitoring, and Kubernetes workload availability controls.
+
+10. **Security Validation:** Perform unit, integration, runtime, and network isolation tests to evaluate deployment readiness and identify security risks.
+
+### 🚀 Expected Outcome
+
+A reproducible, secure-by-design Kubernetes application platform demonstrating practical DevOps and DevSecOps engineering skills, including:
+
+- Automated application deployment and lifecycle management.
+- Container orchestration and workload scalability.
+- Secure authentication and authorization.
+- Network isolation and Kubernetes security controls.
+- PostgreSQL database integration.
+- CI/CD automation and vulnerability scanning.
+- Application reliability and resource optimization.
+- Automated testing and release risk assessment.
+
+> **Project Status:** Completed as a DevSecOps learning and portfolio project. The experimental Payment API release remains on **HOLD** pending resolution or formal acceptance of outstanding security vulnerabilities.
+<img width="1672" height="941" alt="AegisShield DevSecOps Kubernetes Architecture" src="https://github.com/user-attachments/assets/07db6ac8-3b07-4a5e-8aec-2897e2189a10" />
+
+
 ## 2. Project architecture
 
 ```mermaid
