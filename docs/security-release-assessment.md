@@ -44,12 +44,31 @@ This image has not been promoted to production.
 | Restricted Docker runtime | Passed |
 | PostgreSQL connection | Passed |
 | Payment API integration | 6/6 passed |
-| Candidate Kubernetes integration | Not completed |
+| Candidate Kubernetes integration | 6/6 basic tests passed |
 
 The payment integration tests validated database readiness,
 payment creation, retrieval, missing-payment handling,
 invalid-payment handling, and database persistence
 against temporary PostgreSQL.
+
+## Kubernetes integration verification
+
+The experimental Payment API `1.0.6-test4` passed six
+basic Kubernetes integration tests against an isolated,
+temporary PostgreSQL database:
+
+1. API readiness
+2. Payment creation
+3. Payment retrieval
+4. Missing payment returns HTTP 404
+5. Invalid payment returns HTTP 422
+6. PostgreSQL payment persistence
+
+The temporary test namespace was scheduled for deletion.
+The production Payment API remained on image `1.0.3`.
+
+These tests do not establish production-equivalent
+security compliance or authorize deployment.
 
 ## Vulnerability assessment
 
@@ -79,7 +98,7 @@ explicit authorization and appropriate security approval.
 
 1. Assess exploitability and available mitigations.
 2. Resolve or formally accept outstanding security risks.
-3. Complete candidate Kubernetes integration testing.
+3. Validate production-equivalent Kubernetes security controls before release.
 4. Obtain release approval before promotion.
 
 ## Evidence files
